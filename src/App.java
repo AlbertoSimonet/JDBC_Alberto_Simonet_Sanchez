@@ -1,13 +1,12 @@
-import repositorios.AutorRepositorio;
-import repositorios.LibroRepositorio;
-import repositorios.PrestamoRespositorio;
-import repositorios.UsuarioRepositorio;
+import entidades.*;
+import repositorios.*;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -27,50 +26,102 @@ public class App {
 
     public static void main(String[] args) {
         try {
+
             // Abrir conexión
             conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
-   
+
+
             // Borramos si existen anteriormente y creamos las tablas de la BD
+            ////////////////////////////////////////
+            ///////CREANDO LAS TABLAS EN LA BD//////
+            ////////////////////////////////////////
             System.out.println(RESET+"1) Creamos las tablas en la BD"+GREEN);
-            crearTablasBiblioteca();
+            crearTablasBiblioteca();                                                // FUNCION QUE CREA LAS TABLAS
             System.out.println("OK, tablas creadas");
 
+
             // Rellenamos nuestra libreria con 5 libros, 3 autores y 2 usuarios
+            ////////////////////////////////////////
+            ///////INSERTANDO DATOS INICIALES///////
+            ////////////////////////////////////////
             System.out.println(RESET+"2) Insertamos datos inciales"+GREEN);
-            insertarDatosIniciales();
+            insertarDatosIniciales();                                               // FUNCION QUE AGREGA LOS DATOS INCIALES
             System.out.println("OK, datos insertados");
- 
+
+
             // Operaciones con libros
+            ////////////////////////////////////////
+            //////////LISTADO DE LOS LIBROS/////////
+            ////////////////////////////////////////
             System.out.println(RESET+"3) Listado de libros"+GREEN);
-            // TODO listar los libros 
-            
+            LibroRepositorio listaLibros = new LibroRepositorio(conn);              // CREO UNA INSTANCIA DE LibroRepositorio PARA PODER LISTAR
+            List<Libro> lista = listaLibros.findAll();                              // LOS LIBROS CON UN FOREACH
+            for (Libro libro:
+                 lista) {
+                System.out.println(libro.getTitulo());
+            }
+
+
+            ////////////////////////////////////////
+            //////////NUEVO AUTOR AÑADIDO///////////
+            ////////////////////////////////////////
             System.out.println(RESET+"4) Añadimos un nuevo autor ('Armando','Argentina')"+GREEN);
-            // TODO modificar el autor 
+            Autor autorNuevo = new Autor(4, "Armando", "Argentina");
+            AutorRepositorio nuevoAutor = new AutorRepositorio(conn);
+            nuevoAutor.save(autorNuevo);
             System.out.println("OK, nuevo autor insertado id = 4 ");
 
-            System.out.println(RESET+"5) Modificamos el  libro id = 3  ('Lejos de Luisiana' ,2023, 10 copias) y le asociamos el autor Luz Gabás"+GREEN);            
-            // TODO modificar el libro 
+
+            ////////////////////////////////////////
+            //////MODIFICANDO LIBRO CON ID = 3//////
+            ////////////////////////////////////////
+            System.out.println(RESET+"5) Modificamos el  libro id = 3  ('Lejos de Luisiana' ,2023, 10 copias) y le asociamos el autor Luz Gabás"+GREEN);
+            Libro nuevoLibro = new Libro(3, "Lejos de Luisiana", "Luz Gabás", 2023, 10);    // CREO UN LIBRO Y LUEGO USO EL METODO update()
+            listaLibros.update(nuevoLibro);
             System.out.println("Libro modificado correctamente");
 
+
+            ////////////////////////////////////////
+            /////ELIMINANDO EL LIBRO CON ID = 4/////
+            ////////////////////////////////////////
             System.out.println(RESET+"6) Eliminamos el libro con id = 4"+GREEN);
-            // TODO eliminar el libro
+            listaLibros.deleteById(4);
             System.out.println("Libro con el id = 4 eliminado");
-            
+
+
+            ////////////////////////////////////////
+            ///USUARIO 1 TOMA LIBRO 5 (FECHA AYER)//
+            ////////////////////////////////////////
             System.out.println(RESET+"7) Usuario 1 toma prestado el libro 5 con fecha de ayer"+GREEN);
             // TODO realizar prestamo 
             System.out.println("Préstamo realizado");
 
+
+            ////////////////////////////////////////
+            ///USUARIO 2 TOMA LIBRO 5 (FECHA HOY)//
+            ////////////////////////////////////////
             System.out.println(RESET+"8) Usuario 2 toma prestado el libro 5 con fecha de hoy"+GREEN);
             // TODO realizar prestamo
             System.out.println("Lo sentimos pero no quedan copias disponibles");
 
+
+            ////////////////////////////////////////
+            ///USUARIO 2 TOMA LIBRO 2 (FECHA HOY)//
+            ////////////////////////////////////////
             System.out.println(RESET+"9) Usuario 2 toma prestado el libro 2 con fecha de hoy"+GREEN);
             // TODO realizar prestamo
             System.out.println("Préstamo realizado");
 
-            System.out.println(RESET+"10) Mostrar los préstamos de los últimos 10 días"+GREEN);
-            // TODO mostrar los prestamos de los ultimos 10 dias
 
+            ////////////////////////////////////////////////
+            //MUESTRA LOS PRESTAMOS DE LOS ULTIMOS 10 DIAS//
+            ////////////////////////////////////////////////
+            System.out.println(RESET+"10) Mostrar los préstamos de los últimos 10 días"+GREEN);
+
+
+            ///////////////////////////////////////////////
+            ///MUESTRA UNA LISTA DE LIBROS Y SUS AUTORES///
+            ///////////////////////////////////////////////
             System.out.println(RESET+"11) Mostrar listado de libros con sus autores"+GREEN);
             // TODO listado de libros con sus autores
 
