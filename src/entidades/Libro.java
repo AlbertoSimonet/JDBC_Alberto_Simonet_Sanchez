@@ -15,17 +15,6 @@ public class Libro {
         this.copiasDisponibles = copiasDisponibles;
     }
 
-    @Override
-    public String toString() {
-        return "Libro{" +
-                "idLibro=" + idLibro +
-                ", titulo='" + titulo + '\'' +
-                ", autor='" + autor + '\'' +
-                ", yearPublicacion=" + yearPublicacion +
-                ", copiasDisponibles=" + copiasDisponibles +
-                '}';
-    }
-
     public int getIdLibro() { return idLibro; }
 
     public String getTitulo() { return titulo; }
