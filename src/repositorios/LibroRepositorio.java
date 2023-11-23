@@ -6,8 +6,12 @@ import java.sql.Statement;
 import java.util.List;
 
 public class LibroRepositorio implements Repositorio{
+
+    private Connection connection;
+
+    public LibroRepositorio(Connection connection){ this.connection = connection; }
     @Override
-    public void createTable(Connection connection) throws SQLException {
+    public void createTable() throws SQLException {
 
         String crearTablaLibro = "CREATE TABLE IF NOT EXISTS Libro (" +
                 "ID INT PRIMARY KEY," +

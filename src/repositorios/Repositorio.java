@@ -1,13 +1,12 @@
 package repositorios;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
 public interface Repositorio<T> {
 
-    void createTable(Connection conn) throws SQLException;
+    void createTable() throws SQLException;
 
-    List<T> findAll();
+    List<T> findAll() throws SQLException;
 
     T findOneById(int id);
 

@@ -5,8 +5,11 @@ import java.sql.Statement;
 import java.util.List;
 
 public class UsuarioRepositorio implements Repositorio{
+    private Connection connection;
+
+    public UsuarioRepositorio(Connection connection){ this.connection = connection; }
     @Override
-    public void createTable(Connection connection) throws SQLException {
+    public void createTable() throws SQLException {
 
         String crearTablaUsuario = "CREATE TABLE Usuario (" +
                 "ID INT PRIMARY KEY," +
@@ -15,7 +18,6 @@ public class UsuarioRepositorio implements Repositorio{
                 ")";
         Statement sentencia = JdbcManager.createStatement(connection);
         sentencia.executeUpdate(crearTablaUsuario);
-
     }
 
     @Override

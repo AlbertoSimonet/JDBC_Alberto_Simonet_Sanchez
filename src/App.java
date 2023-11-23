@@ -20,7 +20,7 @@ public class App {
     // JDBC URL, usuario, y password para MySQL server
     private static final String JDBC_URL = "jdbc:mysql://localhost:3306/dam";
     private static final String USER = "root";
-    private static final String PASSWORD = "VZvgtt9fv";
+    private static final String PASSWORD = "root";
 
     // Variable JDBC  para manejar la conexión con la BD
     private static Connection conn;
@@ -90,17 +90,17 @@ public class App {
 
     public static void crearTablasBiblioteca() throws SQLException {
 
-        LibroRepositorio crearLibroTabla = new LibroRepositorio();
-        crearLibroTabla.createTable(conn);
+        LibroRepositorio crearLibroTabla = new LibroRepositorio(conn);
+        crearLibroTabla.createTable();
 
-        UsuarioRepositorio crearUsuarioTabla = new UsuarioRepositorio();
-        crearUsuarioTabla.createTable(conn);
+        UsuarioRepositorio crearUsuarioTabla = new UsuarioRepositorio(conn);
+        crearUsuarioTabla.createTable();
 
-        AutorRepositorio crearAutorTabla = new AutorRepositorio();
-        crearAutorTabla.createTable(conn);
+        AutorRepositorio crearAutorTabla = new AutorRepositorio(conn);
+        crearAutorTabla.createTable();
 
-        PrestamoRespositorio crearPrestamoTabla = new PrestamoRespositorio();
-        crearPrestamoTabla.createTable(conn);
+        PrestamoRespositorio crearPrestamoTabla = new PrestamoRespositorio(conn);
+        crearPrestamoTabla.createTable();
      }
 
     public static void insertarDatosIniciales() {
