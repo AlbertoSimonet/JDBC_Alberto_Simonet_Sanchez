@@ -20,7 +20,7 @@ public class LibroRepositorio implements Repositorio {
     public void createTable() throws SQLException {
 
         String crearTablaLibro = "CREATE TABLE IF NOT EXISTS Libro (" +
-                "ID INT PRIMARY KEY," +
+                "ID INT AUTO_INCREMENT PRIMARY KEY," +
                 "Titulo VARCHAR(255)," +
                 "Autor VARCHAR(255)," +
                 "AnioPublicacion INT," +
@@ -82,39 +82,38 @@ public class LibroRepositorio implements Repositorio {
 
     @Override
     public void save(Object o) {
-        String insertSQL = "INSERT INTO libro (ID, Titulo, Autor, AnioPublicacion, CopiasDisponibles) VALUES (?, ?, ?, ?, ?)";
+
+        String insertSQL = "INSERT INTO libro (Titulo, Autor, AnioPublicacion, CopiasDisponibles) VALUES (?, ?, ?, ?)";
+        Libro libro = (Libro) o;
 
         try(PreparedStatement preparedStatement = JdbcManager.createPreparedStatement(connection, insertSQL)) {
 
-            Libro libro = (Libro) o;
-
-            preparedStatement.setInt(1, libro.getIdLibro());
-            preparedStatement.setString(2, libro.getTitulo());
-            preparedStatement.setString(3, libro.getAutor());
-            preparedStatement.setInt(4, libro.getYearPublicacion());
-            preparedStatement.setInt(5, libro.getCopiasDisponibles());
+            preparedStatement.setString(1, libro.getTitulo());
+            preparedStatement.setString(2, libro.getAutor());
+            preparedStatement.setInt(3, libro.getYearPublicacion());
+            preparedStatement.setInt(4, libro.getCopiasDisponibles());
 
             preparedStatement.executeUpdate();
 
-            System.out.println("Libro insertado exitosamente");
+            System.out.println("Libro con la ID: "+libro.getIdLibro()+" insertado exitosamente");
         } catch (SQLException e) {
-            System.out.println("Ha ocurrido un error al tratar de insertar el Libro");
+            System.out.println("Ha ocurrido un error al tratar de insertar el Libro con ID: "+libro.getIdLibro());
             e.printStackTrace();
         }
     }
 
     @Override
     public void update(Object o) {
-        String insertSQL = "UPDATE libro SET ID=?, Titulo=?, Autor=?, AnioPublicacion=?, CopiasDisponibles=?";
+        String insertSQL = "UPDATE libro SET Titulo=?, Autor=?, AnioPublicacion=?, CopiasDisponibles=? WHERE ID=?";
         try(PreparedStatement preparedStatement = JdbcManager.createPreparedStatement(connection, insertSQL)) {
 
             Libro libro = (Libro) o;
 
-            preparedStatement.setInt(1, libro.getIdLibro());
-            preparedStatement.setString(2, libro.getTitulo());
-            preparedStatement.setString(3, libro.getAutor());
-            preparedStatement.setInt(4, libro.getYearPublicacion());
-            preparedStatement.setInt(5, libro.getCopiasDisponibles());
+            preparedStatement.setString(1, libro.getTitulo());
+            preparedStatement.setString(2, libro.getAutor());
+            preparedStatement.setInt(3, libro.getYearPublicacion());
+            preparedStatement.setInt(4, libro.getCopiasDisponibles());
+            preparedStatement.setInt(5, libro.getIdLibro());
 
             preparedStatement.executeUpdate();
 
@@ -136,9 +135,9 @@ public class LibroRepositorio implements Repositorio {
             int rowsDeleted = preparedStatement.executeUpdate();
 
             if (rowsDeleted > 0) {
-                System.out.println("Libro eliminado exitosamente");
+                System.out.println("Libro con ID: "+id+" eliminado exitosamente");
             } else {
-                System.out.println("No se encontró ningún libro con el ID especificado");
+                System.out.println("No se encontró ningún libro con el ID: "+id);
             }
         } catch (SQLException e) {
             e.printStackTrace();

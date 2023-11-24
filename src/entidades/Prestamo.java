@@ -1,27 +1,38 @@
 package entidades;
-import java.util.Date;
+import java.time.LocalDate;
 
 public class Prestamo {
-    private int prestamoID;
-    private Date fechaPrestamo;
-    private Date fechaDevolucion;
-    private int prestamoUsuario;
-    private int prestamoLibro;
-    public Prestamo(int prestamoID, Date fechaPrestamo, Date fechaDevolucion, int prestamoUsuario, int prestamoLibro){
-        this.prestamoID = prestamoID;
+    private Integer ID;
+    private LocalDate fechaPrestamo;
+    private LocalDate fechaDevolucion;
+    private int usuarioID;
+    private int libroID;
+    public Prestamo(Integer prestamoID, LocalDate fechaPrestamo, LocalDate fechaDevolucion, int prestamoUsuario, int prestamoLibro){
+        this.ID = prestamoID;
         this.fechaPrestamo = fechaPrestamo;
         this.fechaDevolucion = fechaDevolucion;
-        this.prestamoUsuario = prestamoUsuario;
-        this.prestamoLibro = prestamoLibro;
+        this.usuarioID = prestamoUsuario;
+        this.libroID = prestamoLibro;
     }
 
-    public int getPrestamoID() { return prestamoID;  }
+    public int getID() { return this.ID; }
 
-    public Date getFechaPrestamo() { return fechaPrestamo; }
+    public LocalDate getFechaPrestamo() { return this.fechaPrestamo; }
 
-    public Date getFechaDevolucion() { return fechaDevolucion; }
+    public LocalDate getFechaDevolucion() { return this.fechaDevolucion; }
 
-    public int getPrestamoUsuario() { return prestamoUsuario; }
+    public int getUsuarioID() { return usuarioID; }
 
-    public int getPrestamoLibro() { return prestamoLibro; }
+    public int getLibroID() { return libroID; }
+
+    @Override
+    public String toString() {
+        return "Prestamo{" +
+                "prestamoID=" + ID +
+                ", fechaPrestamo=" + fechaPrestamo +
+                ", fechaDevolucion=" + fechaDevolucion +
+                ", prestamoUsuario=" + usuarioID +
+                ", prestamoLibro=" + libroID +
+                '}';
+    }
 }

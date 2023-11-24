@@ -1,10 +1,8 @@
 import entidades.*;
 import repositorios.*;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +17,7 @@ public class App {
     // JDBC URL, usuario, y password para MySQL server
     private static final String JDBC_URL = "jdbc:mysql://localhost:3306/dam";
     private static final String USER = "root";
-    private static final String PASSWORD = "root";
+    private static final String PASSWORD = "VZvgtt9fv";
 
     // Variable JDBC  para manejar la conexión con la BD
     private static Connection conn;
@@ -37,8 +35,6 @@ public class App {
             ////////////////////////////////////////
             System.out.println(RESET+"1) Creamos las tablas en la BD"+GREEN);
             crearTablasBiblioteca();                                                // FUNCION QUE CREA LAS TABLAS
-            System.out.println("OK, tablas creadas");
-
 
             // Rellenamos nuestra libreria con 5 libros, 3 autores y 2 usuarios
             ////////////////////////////////////////
@@ -46,20 +42,21 @@ public class App {
             ////////////////////////////////////////
             System.out.println(RESET+"2) Insertamos datos inciales"+GREEN);
             insertarDatosIniciales();                                               // FUNCION QUE AGREGA LOS DATOS INCIALES
-            System.out.println("OK, datos insertados");
-
 
             // Operaciones con libros
             ////////////////////////////////////////
             //////////LISTADO DE LOS LIBROS/////////
             ////////////////////////////////////////
             System.out.println(RESET+"3) Listado de libros"+GREEN);
-            LibroRepositorio listaLibros = new LibroRepositorio(conn);              // CREO UNA INSTANCIA DE LibroRepositorio PARA PODER LISTAR
-            List<Libro> lista = listaLibros.findAll();                              // LOS LIBROS CON UN FOREACH
-            for (Libro libro:
-                 lista) {
-                System.out.println(libro.getTitulo());
+            System.out.println();
+                                                                                    /////////////////////////////////////////////////////////////////
+            LibroRepositorio libroRepositorio= new LibroRepositorio(conn);         // CREO UNA INSTANCIA DE LibroRepositorio PARA PODER LISTAR    //
+            List<Libro> listaLibros = libroRepositorio.findAll();                  // LOS LIBROS CON UN FOREACH, TAMBIEN SERA UTILIZADO PARA LA   //
+            for (Libro libro:                                                       // MAYORIA DE LOS METODOS SIGUIENTES                           //
+                 listaLibros) {                                                     /////////////////////////////////////////////////////////////////
+                System.out.println("Titulo: "+libro.getTitulo());
             }
+            System.out.println();
 
 
             ////////////////////////////////////////
@@ -69,7 +66,9 @@ public class App {
             Autor autorNuevo = new Autor(4, "Armando", "Argentina");
             AutorRepositorio nuevoAutor = new AutorRepositorio(conn);
             nuevoAutor.save(autorNuevo);
-            System.out.println("OK, nuevo autor insertado id = 4 ");
+            System.out.println();
+            System.out.println(autorNuevo);
+            System.out.println();
 
 
             ////////////////////////////////////////
@@ -77,53 +76,60 @@ public class App {
             ////////////////////////////////////////
             System.out.println(RESET+"5) Modificamos el  libro id = 3  ('Lejos de Luisiana' ,2023, 10 copias) y le asociamos el autor Luz Gabás"+GREEN);
             Libro nuevoLibro = new Libro(3, "Lejos de Luisiana", "Luz Gabás", 2023, 10);    // CREO UN LIBRO Y LUEGO USO EL METODO update()
-            listaLibros.update(nuevoLibro);
-            System.out.println("Libro modificado correctamente");
+            libroRepositorio.update(nuevoLibro);
+            System.out.println();
+            System.out.println(nuevoLibro);
+            System.out.println();
 
 
             ////////////////////////////////////////
             /////ELIMINANDO EL LIBRO CON ID = 4/////
             ////////////////////////////////////////
             System.out.println(RESET+"6) Eliminamos el libro con id = 4"+GREEN);
-            listaLibros.deleteById(4);
-            System.out.println("Libro con el id = 4 eliminado");
+            libroRepositorio.deleteById(4);
 
 
             ////////////////////////////////////////
             ///USUARIO 1 TOMA LIBRO 5 (FECHA AYER)//
             ////////////////////////////////////////
             System.out.println(RESET+"7) Usuario 1 toma prestado el libro 5 con fecha de ayer"+GREEN);
-            // TODO realizar prestamo 
-            System.out.println("Préstamo realizado");
+
+            Prestamo prestamoNuevo1 = new Prestamo(null, LocalDate.now().minusDays(1), LocalDate.now().plusDays(10), 1, 5);
+            PrestamoRespositorio prestamos = new PrestamoRespositorio(conn);
+            prestamos.save(prestamoNuevo1);
 
 
             ////////////////////////////////////////
             ///USUARIO 2 TOMA LIBRO 5 (FECHA HOY)//
             ////////////////////////////////////////
             System.out.println(RESET+"8) Usuario 2 toma prestado el libro 5 con fecha de hoy"+GREEN);
-            // TODO realizar prestamo
-            System.out.println("Lo sentimos pero no quedan copias disponibles");
-
+            Prestamo prestamoNuevo2 = new Prestamo(null, LocalDate.now(), LocalDate.now().plusDays(10), 2, 5);
+            prestamos.save(prestamoNuevo2);
 
             ////////////////////////////////////////
             ///USUARIO 2 TOMA LIBRO 2 (FECHA HOY)//
             ////////////////////////////////////////
             System.out.println(RESET+"9) Usuario 2 toma prestado el libro 2 con fecha de hoy"+GREEN);
-            // TODO realizar prestamo
-            System.out.println("Préstamo realizado");
+            Prestamo prestamoNuevo3 = new Prestamo(null, LocalDate.now(), LocalDate.now().plusDays(10), 2, 2);
+            prestamos.save(prestamoNuevo3);
 
 
             ////////////////////////////////////////////////
             //MUESTRA LOS PRESTAMOS DE LOS ULTIMOS 10 DIAS//
             ////////////////////////////////////////////////
             System.out.println(RESET+"10) Mostrar los préstamos de los últimos 10 días"+GREEN);
-
-
+            List<Prestamo> listaPrestamos = prestamos.findAll();
+            for (Prestamo prestamo: listaPrestamos) {
+                System.out.println(prestamo);
+            }
             ///////////////////////////////////////////////
             ///MUESTRA UNA LISTA DE LIBROS Y SUS AUTORES///
             ///////////////////////////////////////////////
             System.out.println(RESET+"11) Mostrar listado de libros con sus autores"+GREEN);
-            // TODO listado de libros con sus autores
+            for (Libro libro: listaLibros) {
+                System.out.println("Titulo: "+ libro.getTitulo()+", Autor: "+libro.getAutor());
+            }
+
 
         } catch (SQLException e) {
             System.out.println("Error al establecer la conexión con la BD");
@@ -152,6 +158,8 @@ public class App {
 
         PrestamoRespositorio crearPrestamoTabla = new PrestamoRespositorio(conn);
         crearPrestamoTabla.createTable();
+
+        System.out.println("OK, tablas creadas");
      }
 
     public static void insertarDatosIniciales() {
@@ -175,6 +183,7 @@ public class App {
                     "(2, 'Antonia Pallicer', 'apllicer@hotmail.com')");
 
             sentencia.close();
+            System.out.println("OK, datos iniciales insertados");
         } catch (SQLException e) {
             e.printStackTrace();
         }

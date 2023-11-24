@@ -1,8 +1,6 @@
 package repositorios;
 
-import entidades.Autor;
 import entidades.Prestamo;
-import entidades.Usuario;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -20,7 +18,7 @@ public class PrestamoRespositorio implements Repositorio {
     public void createTable() throws SQLException {
 
         String crearTablaPrestamo = "CREATE TABLE IF NOT EXISTS Prestamo (" +
-                "IDPrestamo INT PRIMARY KEY," +
+                "IDPrestamo INT AUTO_INCREMENT PRIMARY KEY," +
                 "FechaPrestamo DATE," +
                 "FechaDevolucion DATE," +
                 "IDUsuario INT," +
@@ -47,8 +45,8 @@ public class PrestamoRespositorio implements Repositorio {
             while (result.next()) {
                 Prestamo prestamo = new Prestamo(
                         resultSet.getInt("IDPrestamo"),
-                        resultSet.getDate("FechaPrestamo"),
-                        resultSet.getDate("FechaDevolucion"),
+                        resultSet.getDate("FechaPrestamo").toLocalDate(),
+                        resultSet.getDate("FechaDevolucion").toLocalDate(),
                         resultSet.getInt("IDUsuario"),
                         resultSet.getInt("IDLibro"));
                 listaPrestamos.add(prestamo);
@@ -72,8 +70,8 @@ public class PrestamoRespositorio implements Repositorio {
             while (result.next()) {
                 prestamoEncontrado = new Prestamo(
                         resultSet.getInt("IDPrestamo"),
-                        resultSet.getDate("FechaPrestamo"),
-                        resultSet.getDate("FechaDevolucion"),
+                        resultSet.getDate("FechaPrestamo").toLocalDate(),
+                        resultSet.getDate("FechaDevolucion").toLocalDate(),
                         resultSet.getInt("IDUsuario"),
                         resultSet.getInt("IDLibro"));
             }
@@ -85,43 +83,71 @@ public class PrestamoRespositorio implements Repositorio {
 
     @Override
     public void save(Object o) {
-        String insertSQL = "INSERT INTO prestamo (IDPrestamo, FechaPrestamo, FechaDevolucion, IDUsuario, IDLibro) VALUES (?, ?, ?, ?, ?)";
 
-        try(PreparedStatement preparedStatement = JdbcManager.createPreparedStatement(connection, insertSQL)) {
+        String insertSQL = "INSERT INTO prestamo (FechaPrestamo, FechaDevolucion, IDUsuario, IDLibro) VALUES (?, ?, ?, ?)";
+        Prestamo prestamo = (Prestamo) o;
 
-            Prestamo prestamo = (Prestamo) o;
+        try {
+            // Verificar la disponibilidad de copias antes de insertar el préstamo
+            String verificarCopiasSQL = "SELECT CopiasDisponibles FROM Libro WHERE ID = ? AND CopiasDisponibles > 0 FOR UPDATE";
+            PreparedStatement verificarCopiasStatement = JdbcManager.createPreparedStatement(connection, verificarCopiasSQL);
+            verificarCopiasStatement.setInt(1, prestamo.getLibroID());
+            ResultSet resultSet = verificarCopiasStatement.executeQuery();
 
-            preparedStatement.setInt(1, prestamo.getPrestamoID());
-            preparedStatement.setDate(2, prestamo.getFechaPrestamo());
-            preparedStatement.setDate(3, prestamo.getFechaDevolucion());
-            preparedStatement.setInt(4, prestamo.getPrestamoUsuario());
-            preparedStatement.setInt(5, prestamo.getPrestamoLibro());
+            if (resultSet.next()) { // Si hay resultados, hay copias disponibles
+                int copiasDisponibles = resultSet.getInt("CopiasDisponibles");
+                if (copiasDisponibles > 0) {
+                    // Restar una copia disponible
+                    String actualizarCopiasSQL = "UPDATE Libro SET CopiasDisponibles = ? WHERE ID = ?";
+                    PreparedStatement actualizarCopiasStatement = JdbcManager.createPreparedStatement(connection, actualizarCopiasSQL);
+                    actualizarCopiasStatement.setInt(1, copiasDisponibles - 1);
+                    actualizarCopiasStatement.setInt(2, prestamo.getLibroID());
+                    int filasActualizadas = actualizarCopiasStatement.executeUpdate();
 
-            preparedStatement.executeUpdate();
+                    // Continuar con la inserción del préstamo si la actualización de copias fue exitosa
+                    if (filasActualizadas > 0) {
+                        try (PreparedStatement preparedStatement = JdbcManager.createPreparedStatement(connection, insertSQL)) {
+                            preparedStatement.setDate(1, Date.valueOf(prestamo.getFechaPrestamo()));
+                            preparedStatement.setDate(2, Date.valueOf(prestamo.getFechaDevolucion()));
+                            preparedStatement.setInt(3, prestamo.getUsuarioID());
+                            preparedStatement.setInt(4, prestamo.getLibroID());
 
-            System.out.println("Prestamo insertado exitosamente");
+                            int filasInsertadas = preparedStatement.executeUpdate();
+                            System.out.println("Se ha registrador correctamente el prestamo");
+                        } catch (SQLException e) {
+                            System.out.println("Hubo un problema al actualizar el Prestamo");
+                            e.printStackTrace();
+                        }
+                    } else {
+                        System.out.println("No se pudo actualizar la cantidad de copias disponibles.");
+                        // Puedes manejar esta situación de acuerdo a tus necesidades
+                    }
+                }
+            } else {
+                // No hay copias disponibles para el libro
+                System.out.println("No hay copias disponibles para el libro con ID " + prestamo.getLibroID());
+                // Puedes manejar esta situación de acuerdo a tus necesidades
+            }
         } catch (SQLException e) {
-            System.out.println("Ha ocurrido un error al tratar de insertar el Prestamo");
             e.printStackTrace();
         }
     }
 
     @Override
     public void update(Object o) {
-        String insertSQL = "UPDATE prestamo SET IDPrestamo=?, FechaPrestamo=?, FechaDevolucion=?, IDUsuario=?, IDLibro=?";
-        try(PreparedStatement preparedStatement = JdbcManager.createPreparedStatement(connection, insertSQL)) {
+        String insertSQL = "UPDATE prestamo p JOIN libro l ON p.IDLibro = l.ID SET p.FechaPrestamo=?, p.FechaDevolucion=?, p.IDUsuario=?, p.IDLibro=? WHERE p.IDPrestamo=? AND l.CopiasDisponibles > 0 ";
+        try (PreparedStatement preparedStatement = JdbcManager.createPreparedStatement(connection, insertSQL)) {
 
             Prestamo prestamo = (Prestamo) o;
 
-            preparedStatement.setInt(1, prestamo.getPrestamoID());
-            preparedStatement.setDate(2, prestamo.getFechaPrestamo());
-            preparedStatement.setDate(3, prestamo.getFechaDevolucion());
-            preparedStatement.setInt(4, prestamo.getPrestamoUsuario());
-            preparedStatement.setInt(5, prestamo.getPrestamoLibro());
+            preparedStatement.setDate(1, Date.valueOf(prestamo.getFechaPrestamo()));
+            preparedStatement.setDate(2, Date.valueOf(prestamo.getFechaDevolucion()));
+            preparedStatement.setInt(3, prestamo.getUsuarioID());
+            preparedStatement.setInt(4, prestamo.getLibroID());
+            preparedStatement.setInt(5, prestamo.getID());
 
             preparedStatement.executeUpdate();
 
-            System.out.println("Prestamo actualizado exitosamente");
         } catch (SQLException e) {
             System.out.println("Hubo un problema al actualizar el Prestamo");
             e.printStackTrace();

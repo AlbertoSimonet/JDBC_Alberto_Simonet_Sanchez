@@ -17,7 +17,7 @@ public class AutorRepositorio implements Repositorio {
     @Override
     public void createTable() throws SQLException {
         String crearTablaAutor = "CREATE TABLE IF NOT EXISTS Autor (" +
-                "ID INT PRIMARY KEY," +
+                "ID INT AUTO_INCREMENT PRIMARY KEY," +
                 "Nombre VARCHAR(255)," +
                 "Nacionalidad VARCHAR(255)" +
                 ")";
@@ -74,35 +74,33 @@ public class AutorRepositorio implements Repositorio {
     @Override
     public void save(Object o) {
 
-        String insertSQL = "INSERT INTO autor (ID, Nombre, Nacionalidad) VALUES (?, ?, ?)";
+        String insertSQL = "INSERT INTO autor (Nombre, Nacionalidad) VALUES (?, ?)";
+        Autor autor = (Autor)o;
 
         try(PreparedStatement preparedStatement = JdbcManager.createPreparedStatement(connection, insertSQL)) {
 
-            Autor autor = (Autor)o;
-
-            preparedStatement.setInt(1, autor.getIdAutor());
-            preparedStatement.setString(2, autor.getNombre());
-            preparedStatement.setString(3, autor.getNacionalidad());
+            preparedStatement.setString(1, autor.getNombre());
+            preparedStatement.setString(2, autor.getNacionalidad());
 
             preparedStatement.executeUpdate();
 
-            System.out.println("Autor insertado exitosamente");
+            System.out.println("Autor con el ID: "+autor.getIdAutor()+" insertado exitosamente");
         } catch (SQLException e) {
-            System.out.println("Ha ocurrido un error al tratar de insertar el Autor");
+            System.out.println("Ha ocurrido un error al tratar de insertar el Autor con ID: "+autor.getIdAutor());
             e.printStackTrace();
         }
     }
 
     @Override
     public void update(Object o) {
-        String insertSQL = "UPDATE autor SET ID=?, Nombre=?, Nacionalidad=?";
+        String insertSQL = "UPDATE autor SET Nombre=?, Nacionalidad=? WHERE ID=?";
         try(PreparedStatement preparedStatement = JdbcManager.createPreparedStatement(connection, insertSQL)) {
 
             Autor autor = (Autor)o;
 
-            preparedStatement.setInt(1, autor.getIdAutor());
-            preparedStatement.setString(2, autor.getNombre());
-            preparedStatement.setString(3, autor.getNacionalidad());
+            preparedStatement.setString(1, autor.getNombre());
+            preparedStatement.setString(2, autor.getNacionalidad());
+            preparedStatement.setInt(3, autor.getIdAutor());
 
             preparedStatement.executeUpdate();
 

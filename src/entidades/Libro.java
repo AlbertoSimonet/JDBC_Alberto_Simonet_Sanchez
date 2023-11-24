@@ -2,12 +2,12 @@ package entidades;
 import java.util.Date;
 
 public class Libro {
-    private int idLibro;
+    private Integer idLibro;
     private String titulo;
     private String autor;
     private int yearPublicacion;
     private int copiasDisponibles;
-    public Libro(int idLibro, String titulo, String autor, int yearPublicacion, int copiasDisponibles){
+    public Libro(Integer idLibro, String titulo, String autor, int yearPublicacion, int copiasDisponibles){
         this.idLibro = idLibro;
         this.titulo = titulo;
         this.autor = autor;
@@ -24,4 +24,15 @@ public class Libro {
     public int getYearPublicacion() { return yearPublicacion; }
 
     public int getCopiasDisponibles() { return copiasDisponibles; }
+
+    @Override
+    public String toString() {
+        return "Libro{" +
+                "idLibro=" + idLibro +
+                ", titulo='" + titulo + '\'' +
+                ", autor='" + autor + '\'' +
+                ", yearPublicacion=" + yearPublicacion +
+                ", copiasDisponibles=" + copiasDisponibles +
+                '}';
+    }
 }

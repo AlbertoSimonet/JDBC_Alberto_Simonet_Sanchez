@@ -1,10 +1,10 @@
 package entidades;
 
 public class Autor {
-    private int idAutor;
+    private Integer idAutor;
     private String nombre;
     private String nacionalidad;
-    public Autor(int idAutor, String nombre, String nacionalidad){
+    public Autor(Integer idAutor, String nombre, String nacionalidad){
         this.idAutor = idAutor;
         this.nombre = nombre;
         this.nacionalidad = nacionalidad;
@@ -20,5 +20,14 @@ public class Autor {
 
     public String getNacionalidad() {
         return nacionalidad;
+    }
+
+    @Override
+    public String toString() {
+        return "Autor{" +
+                "idAutor=" + idAutor +
+                ", nombre='" + nombre + '\'' +
+                ", nacionalidad='" + nacionalidad + '\'' +
+                '}';
     }
 }

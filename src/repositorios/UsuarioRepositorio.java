@@ -17,7 +17,7 @@ public class UsuarioRepositorio implements Repositorio {
     public void createTable() throws SQLException {
 
         String crearTablaUsuario = "CREATE TABLE IF NOT EXISTS Usuario (" +
-                "ID INT PRIMARY KEY," +
+                "ID INT AUTO_INCREMENT PRIMARY KEY," +
                 "Nombre VARCHAR(255)," +
                 "CorreoElectronico VARCHAR(255)" +
                 ")";
@@ -74,15 +74,13 @@ public class UsuarioRepositorio implements Repositorio {
     @Override
     public void save(Object o) {
 
-        String insertSQL = "INSERT INTO usuario (ID, Nombre, CorreoElectronico) VALUES (?, ?, ?)";
+        String insertSQL = "INSERT INTO usuario (Nombre, CorreoElectronico) VALUES (?, ?)";
+        Usuario usuario = (Usuario) o;
 
         try(PreparedStatement preparedStatement = JdbcManager.createPreparedStatement(connection, insertSQL)) {
 
-            Usuario usuario = (Usuario) o;
-
-            preparedStatement.setInt(1, usuario.getIdUsuario());
-            preparedStatement.setString(2, usuario.getNombre());
-            preparedStatement.setString(3, usuario.getCorreoElectronico());
+            preparedStatement.setString(1, usuario.getNombre());
+            preparedStatement.setString(2, usuario.getCorreoElectronico());
 
             preparedStatement.executeUpdate();
 
@@ -96,14 +94,14 @@ public class UsuarioRepositorio implements Repositorio {
     @Override
     public void update(Object o) {
 
-        String insertSQL = "UPDATE usuario SET ID=?, Nombre=?, CorreoElectronico=?";
+        String insertSQL = "UPDATE usuario SET Nombre=?, CorreoElectronico=? WHERE ID=?";
         try(PreparedStatement preparedStatement = JdbcManager.createPreparedStatement(connection, insertSQL)) {
 
             Usuario usuario = (Usuario) o;
 
-            preparedStatement.setInt(1, usuario.getIdUsuario());
-            preparedStatement.setString(2, usuario.getNombre());
-            preparedStatement.setString(3, usuario.getCorreoElectronico());
+            preparedStatement.setString(1, usuario.getNombre());
+            preparedStatement.setString(2, usuario.getCorreoElectronico());
+            preparedStatement.setInt(3, usuario.getIdUsuario());
 
             preparedStatement.executeUpdate();
 
