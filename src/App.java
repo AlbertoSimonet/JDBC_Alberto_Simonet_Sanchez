@@ -66,9 +66,6 @@ public class App {
             Autor autorNuevo = new Autor(4, "Armando", "Argentina");
             AutorRepositorio nuevoAutor = new AutorRepositorio(conn);
             nuevoAutor.save(autorNuevo);
-            System.out.println();
-            System.out.println(autorNuevo);
-            System.out.println();
 
 
             ////////////////////////////////////////
@@ -77,9 +74,6 @@ public class App {
             System.out.println(RESET+"5) Modificamos el  libro id = 3  ('Lejos de Luisiana' ,2023, 10 copias) y le asociamos el autor Luz Gabás"+GREEN);
             Libro nuevoLibro = new Libro(3, "Lejos de Luisiana", "Luz Gabás", 2023, 10);    // CREO UN LIBRO Y LUEGO USO EL METODO update()
             libroRepositorio.update(nuevoLibro);
-            System.out.println();
-            System.out.println(nuevoLibro);
-            System.out.println();
 
 
             ////////////////////////////////////////
