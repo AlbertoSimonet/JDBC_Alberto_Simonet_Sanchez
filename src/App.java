@@ -17,7 +17,7 @@ public class App {
     // JDBC URL, usuario, y password para MySQL server
     private static final String JDBC_URL = "jdbc:mysql://localhost:3306/dam";
     private static final String USER = "root";
-    private static final String PASSWORD = "VZvgtt9fv";
+    private static final String PASSWORD = "VUESTRA CONTRASEÑA DE LA BASE DE DATOS";
 
     // Variable JDBC  para manejar la conexión con la BD
     private static Connection conn;
