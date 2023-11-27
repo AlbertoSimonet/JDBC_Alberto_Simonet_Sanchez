@@ -17,7 +17,7 @@ public class App {
     // JDBC URL, usuario, y password para MySQL server
     private static final String JDBC_URL = "jdbc:mysql://localhost:3306/dam";
     private static final String USER = "root";
-    private static final String PASSWORD = "VZvgtt9fv";
+    private static final String PASSWORD = "root";
 
     // Variable JDBC  para manejar la conexión con la BD
     private static Connection conn;
@@ -27,7 +27,6 @@ public class App {
 
             // Abrir conexión
             conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
-
 
             // Borramos si existen anteriormente y creamos las tablas de la BD
             ////////////////////////////////////////
@@ -87,11 +86,9 @@ public class App {
             ///USUARIO 1 TOMA LIBRO 5 (FECHA AYER)//
             ////////////////////////////////////////
             System.out.println(RESET+"7) Usuario 1 toma prestado el libro 5 con fecha de ayer"+GREEN);
-
             Prestamo prestamoNuevo1 = new Prestamo(null, LocalDate.now().minusDays(1), LocalDate.now().plusDays(10), 1, 5);
             PrestamoRespositorio prestamos = new PrestamoRespositorio(conn);
             prestamos.save(prestamoNuevo1);
-            System.out.println(prestamoNuevo1);
 
 
             ////////////////////////////////////////
@@ -113,17 +110,26 @@ public class App {
             //MUESTRA LOS PRESTAMOS DE LOS ULTIMOS 10 DIAS//
             ////////////////////////////////////////////////
             System.out.println(RESET+"10) Mostrar los préstamos de los últimos 10 días"+GREEN);
-            List<Prestamo> listaPrestamos = prestamos.findAll();
+            List<Prestamo> listaPrestamos = prestamos.findDate(10);
+            System.out.println();
             for (Prestamo prestamo: listaPrestamos) {
                 System.out.println(prestamo);
             }
+            System.out.println();
+
+
             ///////////////////////////////////////////////
             ///MUESTRA UNA LISTA DE LIBROS Y SUS AUTORES///
             ///////////////////////////////////////////////
             System.out.println(RESET+"11) Mostrar listado de libros con sus autores"+GREEN);
+            listaLibros = libroRepositorio.BookAndAutor();
+            System.out.println();
             for (Libro libro: listaLibros) {
-                System.out.println("Titulo: "+ libro.getTitulo()+", Autor: ");
+                System.out.println("ID: "+libro.getIdLibro()+" [Titulo: "+ libro.getTitulo()+"]\n"+
+                        "ID Autor: "+libro.getIdAutor()+" [Autor: "+libro.getNombreAutor()+"]");
+                System.out.println();
             }
+            System.out.println();
 
 
         } catch (SQLException e) {

@@ -17,12 +17,17 @@ public class AutorRepositorio implements Repositorio {
     @Override
     public void createTable() throws SQLException {
 
+        Statement sentencia = JdbcManager.createStatement(connection);
+        sentencia.execute("DROP TABLE IF EXISTS Prestamo");
+        sentencia.execute("DROP TABLE IF EXISTS Libro");
+        sentencia.execute("DROP TABLE IF EXISTS Autor");
+        sentencia.execute("DROP TABLE IF EXISTS Usuario");
+
         String crearTablaAutor = "CREATE TABLE IF NOT EXISTS Autor (" +
                 "ID INT AUTO_INCREMENT PRIMARY KEY," +
                 "Nombre VARCHAR(255)," +
                 "Nacionalidad VARCHAR(255)" +
                 ")";
-        Statement sentencia = JdbcManager.createStatement(connection);
         sentencia.executeUpdate(crearTablaAutor);
     }
 

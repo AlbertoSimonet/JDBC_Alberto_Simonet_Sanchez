@@ -19,13 +19,14 @@ public class LibroRepositorio implements Repositorio {
     @Override
     public void createTable() throws SQLException {
 
+        Statement sentencia = JdbcManager.createStatement(connection);
+
         String crearTablaLibro = "CREATE TABLE Libro ("+
                 "ID INT PRIMARY KEY,"+
                 "Titulo VARCHAR(255),"+
                 "AnioPublicacion INT, " +
                 "CopiasDisponibles INT, " +
                 "IDAutor INT, FOREIGN KEY (IDAutor) REFERENCES Autor(ID))";
-        Statement sentencia = JdbcManager.createStatement(connection);
         sentencia.executeUpdate(crearTablaLibro);
     }
 
@@ -141,5 +142,28 @@ public class LibroRepositorio implements Repositorio {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public List BookAndAutor(){
+        Statement sentencia = JdbcManager.createStatement(connection);
+        ArrayList<Libro> listaLibros = new ArrayList<>();
+        String librosYAutores = "SELECT Libro.ID AS LibroID, Libro.Titulo AS TituloLibro, Autor.ID AS AutorID, Autor.Nombre AS NombreAutor FROM Libro JOIN Autor ON Libro.IDAutor = Autor.ID";
+
+        try {
+            ResultSet resultSet = sentencia.executeQuery(librosYAutores);
+            ResultSet result = sentencia.getResultSet();
+            while (result.next()) {
+                Libro libro = new Libro(
+                        resultSet.getInt("LibroID"),
+                        resultSet.getString("TituloLibro"),
+                        resultSet.getInt("AutorID"),
+                        resultSet.getString("NombreAutor"));
+                listaLibros.add(libro);
+            }
+        } catch (SQLException e) {
+            System.out.println("Hubo un problema con la lista de Libros");
+            throw new RuntimeException(e);
+        }
+        return listaLibros;
     }
 }

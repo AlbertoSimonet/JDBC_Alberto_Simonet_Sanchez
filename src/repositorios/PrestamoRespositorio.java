@@ -18,6 +18,7 @@ public class PrestamoRespositorio implements Repositorio {
     @Override
     public void createTable() throws SQLException {
 
+        Statement sentencia = JdbcManager.createStatement(connection);
         String crearTablaPrestamo = "CREATE TABLE IF NOT EXISTS Prestamo (" +
                 "IDPrestamo INT AUTO_INCREMENT PRIMARY KEY," +
                 "FechaPrestamo DATE," +
@@ -27,7 +28,6 @@ public class PrestamoRespositorio implements Repositorio {
                 "FOREIGN KEY (IDUsuario) REFERENCES Usuario(ID)," +
                 "FOREIGN KEY (IDLibro) REFERENCES Libro(ID)" +
                 ")";
-        Statement sentencia = JdbcManager.createStatement(connection);
         sentencia.executeUpdate(crearTablaPrestamo);
 
     }
@@ -173,26 +173,24 @@ public class PrestamoRespositorio implements Repositorio {
             e.printStackTrace();
         }
     }
-    public List findDate(LocalDate fechaHoy, LocalDate fechaDefinir){
+    public List<Prestamo> findDate(int diasAntes) {
+        ArrayList<Prestamo> listaPrestamos = new ArrayList<>();
+        String findDateQuery = "SELECT" +
+                " IDPrestamo," +
+                " FechaPrestamo," +
+                " FechaDevolucion," +
+                " IDUsuario," +
+                " IDLibro" +
+                " FROM" +
+                " Prestamo" +
+                " WHERE" +
+                " FechaPrestamo BETWEEN DATE_SUB(CURDATE(), INTERVAL ? DAY) AND CURDATE();";
 
-            Statement sentencia = JdbcManager.createStatement(connection);
-            ArrayList<Prestamo> listaPrestamos = new ArrayList<>();
-            String librosYAutores = "SELECT Libro.ID AS LibroID, Libro.Titulo AS TituloLibro, Autor.ID AS AutorID, Autor.Nombre AS NombreAutor FROM Libro JOIN Autor ON Libro.IDAutor = Autor.ID";
-            String findDateQuery = "SELECT\n" +
-                    "    IDPrestamo,\n" +
-                    "    FechaPrestamo,\n" +
-                    "    FechaDevolucion,\n" +
-                    "    IDUsuario,\n" +
-                    "    IDLibro\n" +
-                    "FROM\n" +
-                    "    Prestamo\n" +
-                    "WHERE\n" +
-                    "    FechaPrestamo BETWEEN DATE_SUB(CURDATE(), INTERVAL 10 DAY) AND CURDATE();";
+        try (PreparedStatement preparedStatement = JdbcManager.createPreparedStatement(connection, findDateQuery)) {
+            preparedStatement.setInt(1, diasAntes);
 
-            try {
-                ResultSet resultSet = sentencia.executeQuery(findDateQuery);
-                ResultSet result = sentencia.getResultSet();
-                while (result.next()) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
                     Prestamo prestamo = new Prestamo(
                             resultSet.getInt("IDPrestamo"),
                             resultSet.getDate("FechaPrestamo").toLocalDate(),
@@ -201,10 +199,11 @@ public class PrestamoRespositorio implements Repositorio {
                             resultSet.getInt("IDLibro"));
                     listaPrestamos.add(prestamo);
                 }
-            } catch (SQLException e) {
-                System.out.println("Hubo un problema con la lista de Prestamos");
-                throw new RuntimeException(e);
             }
-            return listaPrestamos;
+        } catch (SQLException e) {
+            System.out.println("Hubo un problema con la lista de Prestamos");
+            throw new RuntimeException(e);
+        }
+        return listaPrestamos;
     }
 }

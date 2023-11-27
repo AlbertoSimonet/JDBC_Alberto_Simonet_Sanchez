@@ -16,12 +16,13 @@ public class UsuarioRepositorio implements Repositorio {
     @Override
     public void createTable() throws SQLException {
 
+        Statement sentencia = JdbcManager.createStatement(connection);
+
         String crearTablaUsuario = "CREATE TABLE IF NOT EXISTS Usuario (" +
                 "ID INT AUTO_INCREMENT PRIMARY KEY," +
                 "Nombre VARCHAR(255)," +
                 "CorreoElectronico VARCHAR(255)" +
                 ")";
-        Statement sentencia = JdbcManager.createStatement(connection);
         sentencia.executeUpdate(crearTablaUsuario);
     }
 
