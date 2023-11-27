@@ -17,7 +17,7 @@ public class App {
     // JDBC URL, usuario, y password para MySQL server
     private static final String JDBC_URL = "jdbc:mysql://localhost:3306/dam";
     private static final String USER = "root";
-    private static final String PASSWORD = "VUESTRA CONTRASEÑA DE LA BASE DE DATOS";
+    private static final String PASSWORD = "VZvgtt9fv";
 
     // Variable JDBC  para manejar la conexión con la BD
     private static Connection conn;
@@ -62,8 +62,8 @@ public class App {
             ////////////////////////////////////////
             //////////NUEVO AUTOR AÑADIDO///////////
             ////////////////////////////////////////
-            System.out.println(RESET+"4) Añadimos un nuevo autor ('Armando','Argentina')"+GREEN);
-            Autor autorNuevo = new Autor(4, "Armando", "Argentina");
+            System.out.println(RESET+"4) Añadimos un nuevo autor ('Luz','Gabás')"+GREEN);
+            Autor autorNuevo = new Autor(4, "Luz Gabás", "española");
             AutorRepositorio nuevoAutor = new AutorRepositorio(conn);
             nuevoAutor.save(autorNuevo);
 
@@ -72,7 +72,7 @@ public class App {
             //////MODIFICANDO LIBRO CON ID = 3//////
             ////////////////////////////////////////
             System.out.println(RESET+"5) Modificamos el  libro id = 3  ('Lejos de Luisiana' ,2023, 10 copias) y le asociamos el autor Luz Gabás"+GREEN);
-            Libro nuevoLibro = new Libro(3, "Lejos de Luisiana", "Luz Gabás", 2023, 10);    // CREO UN LIBRO Y LUEGO USO EL METODO update()
+            Libro nuevoLibro = new Libro(3, "Lejos de Luisiana", 2023, 10, 4);    // CREO UN LIBRO Y LUEGO USO EL METODO update()
             libroRepositorio.update(nuevoLibro);
 
 
@@ -91,6 +91,7 @@ public class App {
             Prestamo prestamoNuevo1 = new Prestamo(null, LocalDate.now().minusDays(1), LocalDate.now().plusDays(10), 1, 5);
             PrestamoRespositorio prestamos = new PrestamoRespositorio(conn);
             prestamos.save(prestamoNuevo1);
+            System.out.println(prestamoNuevo1);
 
 
             ////////////////////////////////////////
@@ -121,7 +122,7 @@ public class App {
             ///////////////////////////////////////////////
             System.out.println(RESET+"11) Mostrar listado de libros con sus autores"+GREEN);
             for (Libro libro: listaLibros) {
-                System.out.println("Titulo: "+ libro.getTitulo()+", Autor: "+libro.getAutor());
+                System.out.println("Titulo: "+ libro.getTitulo()+", Autor: ");
             }
 
 
@@ -141,14 +142,14 @@ public class App {
 
     public static void crearTablasBiblioteca() throws SQLException {
 
+        AutorRepositorio crearAutorTabla = new AutorRepositorio(conn);
+        crearAutorTabla.createTable();
+
         LibroRepositorio crearLibroTabla = new LibroRepositorio(conn);
         crearLibroTabla.createTable();
 
         UsuarioRepositorio crearUsuarioTabla = new UsuarioRepositorio(conn);
         crearUsuarioTabla.createTable();
-
-        AutorRepositorio crearAutorTabla = new AutorRepositorio(conn);
-        crearAutorTabla.createTable();
 
         PrestamoRespositorio crearPrestamoTabla = new PrestamoRespositorio(conn);
         crearPrestamoTabla.createTable();
@@ -165,22 +166,24 @@ public class App {
                     "(2, 'Miguel de Cervantes', 'española'), " +
                     "(3, 'Isabel Allende', 'chilena')");
 
-            sentencia.executeUpdate("INSERT INTO Libro (ID, Titulo, Autor, AnioPublicacion, CopiasDisponibles) VALUES " +
-                    "(1, 'Vuelta al mundo en 80 dias', 'Julio Verne', 1872, 5), " +
-                    "(2, 'El Quijote', 'Miguel de Cervantes', 1615, 20), " +
-                    "(3, 'Veinte mil leguas de viaje submarino', 'Julio Verne', 1970, 2), " +
-                    "(4, 'De la Tierra a la Luna', 'Julio Verne', 1864, 6), " +
-                    "(5, 'La casa de los espíritus', 'Isabel Allende', 1982, 1)");
+            sentencia.executeUpdate("INSERT INTO Libro (ID, Titulo, AnioPublicacion, CopiasDisponibles, IDAutor) VALUES " +
+                    "(1, 'Vuelta al mundo en 80 dias', 1872, 5, 1), " +
+                    "(2, 'El Quijote', 1615, 20, 2), " +
+                    "(3, 'Veinte mil leguas de viaje submarino', 1970, 2, 1), " +
+                    "(4, 'De la Tierra a la Luna', 1864, 6, 1), " +
+                    "(5, 'La casa de los espíritus', 1982, 1, 3)");
 
             sentencia.executeUpdate("INSERT INTO Usuario (ID, Nombre, CorreoElectronico) VALUES " +
                     "(1, 'Federico Fiallos', 'ffiallos@hotmail.com'), " +
                     "(2, 'Antonia Pallicer', 'apllicer@hotmail.com')");
+
 
             sentencia.close();
             System.out.println("OK, datos iniciales insertados");
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
     }
 }
 

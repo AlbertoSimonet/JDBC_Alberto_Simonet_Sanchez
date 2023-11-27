@@ -16,6 +16,7 @@ public class AutorRepositorio implements Repositorio {
 
     @Override
     public void createTable() throws SQLException {
+
         String crearTablaAutor = "CREATE TABLE IF NOT EXISTS Autor (" +
                 "ID INT AUTO_INCREMENT PRIMARY KEY," +
                 "Nombre VARCHAR(255)," +

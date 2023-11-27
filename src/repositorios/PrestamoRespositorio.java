@@ -3,6 +3,7 @@ package repositorios;
 import entidades.Prestamo;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +53,7 @@ public class PrestamoRespositorio implements Repositorio {
                 listaPrestamos.add(prestamo);
             }
         } catch (SQLException e) {
-            System.out.println("Hubo un problema con la lista de Autores");
+            System.out.println("Hubo un problema con la lista de Prestamos");
             throw new RuntimeException(e);
         }
         return listaPrestamos;
@@ -113,6 +114,7 @@ public class PrestamoRespositorio implements Repositorio {
                             preparedStatement.setInt(4, prestamo.getLibroID());
 
                             int filasInsertadas = preparedStatement.executeUpdate();
+
                             System.out.println("Se ha registrador correctamente el prestamo");
                         } catch (SQLException e) {
                             System.out.println("Hubo un problema al actualizar el Prestamo");
@@ -120,13 +122,11 @@ public class PrestamoRespositorio implements Repositorio {
                         }
                     } else {
                         System.out.println("No se pudo actualizar la cantidad de copias disponibles.");
-                        // Puedes manejar esta situación de acuerdo a tus necesidades
                     }
                 }
             } else {
                 // No hay copias disponibles para el libro
                 System.out.println("No hay copias disponibles para el libro con ID " + prestamo.getLibroID());
-                // Puedes manejar esta situación de acuerdo a tus necesidades
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -172,5 +172,39 @@ public class PrestamoRespositorio implements Repositorio {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+    public List findDate(LocalDate fechaHoy, LocalDate fechaDefinir){
+
+            Statement sentencia = JdbcManager.createStatement(connection);
+            ArrayList<Prestamo> listaPrestamos = new ArrayList<>();
+            String librosYAutores = "SELECT Libro.ID AS LibroID, Libro.Titulo AS TituloLibro, Autor.ID AS AutorID, Autor.Nombre AS NombreAutor FROM Libro JOIN Autor ON Libro.IDAutor = Autor.ID";
+            String findDateQuery = "SELECT\n" +
+                    "    IDPrestamo,\n" +
+                    "    FechaPrestamo,\n" +
+                    "    FechaDevolucion,\n" +
+                    "    IDUsuario,\n" +
+                    "    IDLibro\n" +
+                    "FROM\n" +
+                    "    Prestamo\n" +
+                    "WHERE\n" +
+                    "    FechaPrestamo BETWEEN DATE_SUB(CURDATE(), INTERVAL 10 DAY) AND CURDATE();";
+
+            try {
+                ResultSet resultSet = sentencia.executeQuery(findDateQuery);
+                ResultSet result = sentencia.getResultSet();
+                while (result.next()) {
+                    Prestamo prestamo = new Prestamo(
+                            resultSet.getInt("IDPrestamo"),
+                            resultSet.getDate("FechaPrestamo").toLocalDate(),
+                            resultSet.getDate("FechaDevolucion").toLocalDate(),
+                            resultSet.getInt("IDUsuario"),
+                            resultSet.getInt("IDLibro"));
+                    listaPrestamos.add(prestamo);
+                }
+            } catch (SQLException e) {
+                System.out.println("Hubo un problema con la lista de Prestamos");
+                throw new RuntimeException(e);
+            }
+            return listaPrestamos;
     }
 }

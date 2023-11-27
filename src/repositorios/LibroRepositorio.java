@@ -19,13 +19,12 @@ public class LibroRepositorio implements Repositorio {
     @Override
     public void createTable() throws SQLException {
 
-        String crearTablaLibro = "CREATE TABLE IF NOT EXISTS Libro (" +
-                "ID INT AUTO_INCREMENT PRIMARY KEY," +
-                "Titulo VARCHAR(255)," +
-                "Autor VARCHAR(255)," +
-                "AnioPublicacion INT," +
-                "CopiasDisponibles INT" +
-                ")";
+        String crearTablaLibro = "CREATE TABLE Libro ("+
+                "ID INT PRIMARY KEY,"+
+                "Titulo VARCHAR(255),"+
+                "AnioPublicacion INT, " +
+                "CopiasDisponibles INT, " +
+                "IDAutor INT, FOREIGN KEY (IDAutor) REFERENCES Autor(ID))";
         Statement sentencia = JdbcManager.createStatement(connection);
         sentencia.executeUpdate(crearTablaLibro);
     }
@@ -45,9 +44,9 @@ public class LibroRepositorio implements Repositorio {
                 Libro libro = new Libro(
                         resultSet.getInt("ID"),
                         resultSet.getString("Titulo"),
-                        resultSet.getString("Autor"),
                         resultSet.getInt("AnioPublicacion"),
-                        resultSet.getInt("CopiasDisponibles"));
+                        resultSet.getInt("CopiasDisponibles"),
+                        resultSet.getInt("IDAutor"));
                 listaLibros.add(libro);
             }
         } catch (SQLException e) {
@@ -70,9 +69,9 @@ public class LibroRepositorio implements Repositorio {
                 libroEncontrado = new Libro(
                         resultSet.getInt("ID"),
                         resultSet.getString("Titulo"),
-                        resultSet.getString("Autor"),
                         resultSet.getInt("AnioPublicacion"),
-                        resultSet.getInt("CopiasDisponibles")                        );
+                        resultSet.getInt("CopiasDisponibles"),
+                        resultSet.getInt("IDAutor"));
             }
         } catch (SQLException e) {
             System.out.println("Hubo un problema con el ResultSet de la sentencia SQL");
@@ -83,15 +82,15 @@ public class LibroRepositorio implements Repositorio {
     @Override
     public void save(Object o) {
 
-        String insertSQL = "INSERT INTO libro (Titulo, Autor, AnioPublicacion, CopiasDisponibles) VALUES (?, ?, ?, ?)";
+        String insertSQL = "INSERT INTO libro (Titulo, AnioPublicacion, CopiasDisponibles, IDAutor) VALUES (?, ?, ?, ?)";
         Libro libro = (Libro) o;
 
         try(PreparedStatement preparedStatement = JdbcManager.createPreparedStatement(connection, insertSQL)) {
 
             preparedStatement.setString(1, libro.getTitulo());
-            preparedStatement.setString(2, libro.getAutor());
-            preparedStatement.setInt(3, libro.getYearPublicacion());
-            preparedStatement.setInt(4, libro.getCopiasDisponibles());
+            preparedStatement.setInt(2, libro.getYearPublicacion());
+            preparedStatement.setInt(3, libro.getCopiasDisponibles());
+            preparedStatement.setInt(4, libro.getIDAutor());
 
             preparedStatement.executeUpdate();
 
@@ -104,15 +103,15 @@ public class LibroRepositorio implements Repositorio {
 
     @Override
     public void update(Object o) {
-        String insertSQL = "UPDATE libro SET Titulo=?, Autor=?, AnioPublicacion=?, CopiasDisponibles=? WHERE ID=?";
+        String insertSQL = "UPDATE libro SET Titulo=?, AnioPublicacion=?, CopiasDisponibles=?, IDAutor=? WHERE ID=?";
         try(PreparedStatement preparedStatement = JdbcManager.createPreparedStatement(connection, insertSQL)) {
 
             Libro libro = (Libro) o;
 
             preparedStatement.setString(1, libro.getTitulo());
-            preparedStatement.setString(2, libro.getAutor());
-            preparedStatement.setInt(3, libro.getYearPublicacion());
-            preparedStatement.setInt(4, libro.getCopiasDisponibles());
+            preparedStatement.setInt(2, libro.getYearPublicacion());
+            preparedStatement.setInt(3, libro.getCopiasDisponibles());
+            preparedStatement.setInt(4, libro.getIDAutor());
             preparedStatement.setInt(5, libro.getIdLibro());
 
             preparedStatement.executeUpdate();
