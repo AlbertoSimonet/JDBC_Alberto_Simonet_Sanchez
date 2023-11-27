@@ -22,12 +22,13 @@ public class LibroRepositorio implements Repositorio {
         Statement sentencia = JdbcManager.createStatement(connection);
 
         String crearTablaLibro = "CREATE TABLE Libro ("+
-                "ID INT PRIMARY KEY,"+
+                "ID INT AUTO_INCREMENT PRIMARY KEY,"+
                 "Titulo VARCHAR(255),"+
                 "AnioPublicacion INT, " +
                 "CopiasDisponibles INT, " +
                 "IDAutor INT, FOREIGN KEY (IDAutor) REFERENCES Autor(ID))";
         sentencia.executeUpdate(crearTablaLibro);
+        System.out.println("Tabla libros creada");
     }
 
     @Override
@@ -95,7 +96,7 @@ public class LibroRepositorio implements Repositorio {
 
             preparedStatement.executeUpdate();
 
-            System.out.println("Libro con la ID: "+libro.getIdLibro()+" insertado exitosamente");
+            System.out.println("Libro: "+libro.getTitulo()+" insertado exitosamente");
         } catch (SQLException e) {
             System.out.println("Ha ocurrido un error al tratar de insertar el Libro con ID: "+libro.getIdLibro());
             e.printStackTrace();
@@ -117,7 +118,7 @@ public class LibroRepositorio implements Repositorio {
 
             preparedStatement.executeUpdate();
 
-            System.out.println("Libro actualizado exitosamente");
+            System.out.println("Libro: "+libro.getIdLibro()+" actualizado exitosamente");
         } catch (SQLException e) {
             System.out.println("Hubo un problema al actualizar el Libro");
             e.printStackTrace();
@@ -148,6 +149,8 @@ public class LibroRepositorio implements Repositorio {
         Statement sentencia = JdbcManager.createStatement(connection);
         ArrayList<Libro> listaLibros = new ArrayList<>();
         String librosYAutores = "SELECT Libro.ID AS LibroID, Libro.Titulo AS TituloLibro, Autor.ID AS AutorID, Autor.Nombre AS NombreAutor FROM Libro JOIN Autor ON Libro.IDAutor = Autor.ID";
+        // El String librosYAutores genera una query que utiliza JOIN para poder mostrar el libro
+        // junto con su autor utilizando el ID del autor como conexion entre ambas tablas
 
         try {
             ResultSet resultSet = sentencia.executeQuery(librosYAutores);

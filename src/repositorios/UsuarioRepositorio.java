@@ -24,6 +24,7 @@ public class UsuarioRepositorio implements Repositorio {
                 "CorreoElectronico VARCHAR(255)" +
                 ")";
         sentencia.executeUpdate(crearTablaUsuario);
+        System.out.println("Tabla usuarios creada");
     }
 
     @Override
@@ -85,7 +86,7 @@ public class UsuarioRepositorio implements Repositorio {
 
             preparedStatement.executeUpdate();
 
-            System.out.println("Usuario insertado exitosamente");
+            System.out.println("Usuario: "+usuario.getNombre()+" insertado exitosamente");
         } catch (SQLException e) {
             System.out.println("Ha ocurrido un error al tratar de insertar el Usuario");
             e.printStackTrace();

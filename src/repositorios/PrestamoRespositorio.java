@@ -29,13 +29,14 @@ public class PrestamoRespositorio implements Repositorio {
                 "FOREIGN KEY (IDLibro) REFERENCES Libro(ID)" +
                 ")";
         sentencia.executeUpdate(crearTablaPrestamo);
-
+        System.out.println("Tabla prestamos creada");
     }
 
     @Override
     public List findAll() throws SQLException {
 
         // Creamos la sentencia y creamos una lista de los Prestamos para devolverla
+
         Statement sentencia = JdbcManager.createStatement(connection);
         ArrayList<Prestamo> listaPrestamos = new ArrayList<>();
         String query = "SELECT * FROM prestamo";
@@ -85,17 +86,20 @@ public class PrestamoRespositorio implements Repositorio {
     @Override
     public void save(Object o) {
 
+        // Esta funcion es un poco mas compleja porque debemos actualizar la tabla de libros restandole 1
+        // siempre y cuando realmente haya copias disponibles.
+
         String insertSQL = "INSERT INTO prestamo (FechaPrestamo, FechaDevolucion, IDUsuario, IDLibro) VALUES (?, ?, ?, ?)";
         Prestamo prestamo = (Prestamo) o;
 
         try {
-            // Verificar la disponibilidad de copias antes de insertar el préstamo
+            // Verificar la disponibilidad de copias antes de insertar el prestamo
             String verificarCopiasSQL = "SELECT CopiasDisponibles FROM Libro WHERE ID = ? AND CopiasDisponibles > 0 FOR UPDATE";
             PreparedStatement verificarCopiasStatement = JdbcManager.createPreparedStatement(connection, verificarCopiasSQL);
             verificarCopiasStatement.setInt(1, prestamo.getLibroID());
             ResultSet resultSet = verificarCopiasStatement.executeQuery();
 
-            if (resultSet.next()) { // Si hay resultados, hay copias disponibles
+            if (resultSet.next()) { // Si hay resultados, es porque hay copias disponibles
                 int copiasDisponibles = resultSet.getInt("CopiasDisponibles");
                 if (copiasDisponibles > 0) {
                     // Restar una copia disponible
@@ -105,7 +109,7 @@ public class PrestamoRespositorio implements Repositorio {
                     actualizarCopiasStatement.setInt(2, prestamo.getLibroID());
                     int filasActualizadas = actualizarCopiasStatement.executeUpdate();
 
-                    // Continuar con la inserción del préstamo si la actualización de copias fue exitosa
+                    // Continuar con el prestamo si la actualizacion de copias funciona
                     if (filasActualizadas > 0) {
                         try (PreparedStatement preparedStatement = JdbcManager.createPreparedStatement(connection, insertSQL)) {
                             preparedStatement.setDate(1, Date.valueOf(prestamo.getFechaPrestamo()));
@@ -115,7 +119,8 @@ public class PrestamoRespositorio implements Repositorio {
 
                             int filasInsertadas = preparedStatement.executeUpdate();
 
-                            System.out.println("Se ha registrador correctamente el prestamo");
+                            System.out.println("Se ha actualizado el libro con ID: "+prestamo.getLibroID());
+                            System.out.println("Se ha registrado correctamente el prestamo");
                         } catch (SQLException e) {
                             System.out.println("Hubo un problema al actualizar el Prestamo");
                             e.printStackTrace();
@@ -125,7 +130,6 @@ public class PrestamoRespositorio implements Repositorio {
                     }
                 }
             } else {
-                // No hay copias disponibles para el libro
                 System.out.println("No hay copias disponibles para el libro con ID " + prestamo.getLibroID());
             }
         } catch (SQLException e) {
@@ -174,6 +178,8 @@ public class PrestamoRespositorio implements Repositorio {
         }
     }
     public List<Prestamo> findDate(int diasAntes) {
+        // Este metodo nos permite generar una lista de prestamos a partir del dia de hoy (CURDATE())
+        // y el numero de dias anteriores que queramos consultar, a partir de la query de MySQL
         ArrayList<Prestamo> listaPrestamos = new ArrayList<>();
         String findDateQuery = "SELECT" +
                 " IDPrestamo," +

@@ -3,8 +3,6 @@ import repositorios.*;
 
 import java.sql.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -19,7 +17,7 @@ public class App {
     private static final String USER = "root";
     private static final String PASSWORD = "root";
 
-    // Variable JDBC  para manejar la conexión con la BD
+    // Variable JDBC para manejar la conexión con la BD
     private static Connection conn;
 
     public static void main(String[] args) {
@@ -35,14 +33,12 @@ public class App {
             System.out.println(RESET+"1) Creamos las tablas en la BD"+GREEN);
             crearTablasBiblioteca();                                                // FUNCION QUE CREA LAS TABLAS
 
-            // Rellenamos nuestra libreria con 5 libros, 3 autores y 2 usuarios
             ////////////////////////////////////////
             ///////INSERTANDO DATOS INICIALES///////
             ////////////////////////////////////////
             System.out.println(RESET+"2) Insertamos datos inciales"+GREEN);
             insertarDatosIniciales();                                               // FUNCION QUE AGREGA LOS DATOS INCIALES
 
-            // Operaciones con libros
             ////////////////////////////////////////
             //////////LISTADO DE LOS LIBROS/////////
             ////////////////////////////////////////
@@ -53,7 +49,7 @@ public class App {
             List<Libro> listaLibros = libroRepositorio.findAll();                  // LOS LIBROS CON UN FOREACH, TAMBIEN SERA UTILIZADO PARA LA   //
             for (Libro libro:                                                       // MAYORIA DE LOS METODOS SIGUIENTES                           //
                  listaLibros) {                                                     /////////////////////////////////////////////////////////////////
-                System.out.println("Titulo: "+libro.getTitulo());
+                System.out.println("ID: "+libro.getIdLibro()+", Titulo: "+libro.getTitulo()+", Anyo: "+libro.getYearPublicacion()+", Copias: "+libro.getCopiasDisponibles());
             }
             System.out.println();
 
@@ -137,7 +133,7 @@ public class App {
             System.out.println(e.getMessage());
         } finally {
             try {
-                // Cerrar conexión
+                // Se cierra conexion
                 if (conn != null) conn.close();
             } catch (SQLException e) {
                 System.out.println("error al cerrar la conexión con la BD");
@@ -147,6 +143,9 @@ public class App {
     }
 
     public static void crearTablasBiblioteca() throws SQLException {
+
+        // Creamos las tablas, la funcion createTable de AutorRepositorio comprueba si existen las tablas en la BD para eliminarlas
+        // y despues crearlas de nuevo, esto evita errores a la hora de ejecutar por segunda vez la App
 
         AutorRepositorio crearAutorTabla = new AutorRepositorio(conn);
         crearAutorTabla.createTable();
@@ -164,30 +163,34 @@ public class App {
      }
 
     public static void insertarDatosIniciales() {
-        try {
-            Statement sentencia = conn.createStatement();
 
-            sentencia.executeUpdate("INSERT INTO Autor (ID, Nombre, Nacionalidad) VALUES " +
-                    "(1, 'Julio Verne', 'francesa'), " +
-                    "(2, 'Miguel de Cervantes', 'española'), " +
-                    "(3, 'Isabel Allende', 'chilena')");
+            AutorRepositorio listaAutores = new AutorRepositorio(conn);
+            LibroRepositorio listaLibros = new LibroRepositorio(conn);
+            UsuarioRepositorio listaUsuarios = new UsuarioRepositorio(conn); // Creamos instancias de los repositorios para insertar los datos
 
-            sentencia.executeUpdate("INSERT INTO Libro (ID, Titulo, AnioPublicacion, CopiasDisponibles, IDAutor) VALUES " +
-                    "(1, 'Vuelta al mundo en 80 dias', 1872, 5, 1), " +
-                    "(2, 'El Quijote', 1615, 20, 2), " +
-                    "(3, 'Veinte mil leguas de viaje submarino', 1970, 2, 1), " +
-                    "(4, 'De la Tierra a la Luna', 1864, 6, 1), " +
-                    "(5, 'La casa de los espíritus', 1982, 1, 3)");
+            Autor julioVerne = new Autor(1, "Julio Verne", "francesa");
+            Autor miguelDeCervantes = new Autor(2, "Miguel de Cervantes", "española");
+            Autor isabelAllende = new Autor(3, "Isabel Allende", "chilena");
+            listaAutores.save(julioVerne);
+            listaAutores.save(miguelDeCervantes);
+            listaAutores.save(isabelAllende); // Se crea y se guarda los autores en la tabla
 
-            sentencia.executeUpdate("INSERT INTO Usuario (ID, Nombre, CorreoElectronico) VALUES " +
-                    "(1, 'Federico Fiallos', 'ffiallos@hotmail.com'), " +
-                    "(2, 'Antonia Pallicer', 'apllicer@hotmail.com')");
+            Libro vueltaAlMundo = new Libro(1, "Vuelta al mundo en 80 dias", 1872, 5, 1);
+            Libro elQuijote = new Libro(2, "El Quijote", 1615, 20, 2);
+            Libro veinteMilLeguas = new Libro(3, "Veinte mil leguas de viaje submarino", 1970, 2, 1);
+            Libro deLaTierra = new Libro(4, "De la Tierra a la Luna", 1864, 6, 1);
+            Libro laCasaEspiritus = new Libro(5, "La casa de los espíritus", 1982, 1, 3);
+            listaLibros.save(vueltaAlMundo);
+            listaLibros.save(elQuijote);
+            listaLibros.save(veinteMilLeguas);
+            listaLibros.save(deLaTierra);
+            listaLibros.save(laCasaEspiritus); // Se crean y se guardan los libros en la tabla
 
+            Usuario usuario1 = new Usuario(1, "Federico Fiallos", "ffiallos@hotmail.com");
+            Usuario usuario2 = new Usuario(2, "Antonia Pallicer", "apllicer@hotmail.com");
+            listaUsuarios.save(usuario1);
+            listaUsuarios.save(usuario2); // Se crean y se guardan los usuarios en la tabla
 
-            sentencia.close();
             System.out.println("OK, datos iniciales insertados");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 }

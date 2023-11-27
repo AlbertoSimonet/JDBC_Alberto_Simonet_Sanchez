@@ -29,6 +29,7 @@ public class AutorRepositorio implements Repositorio {
                 "Nacionalidad VARCHAR(255)" +
                 ")";
         sentencia.executeUpdate(crearTablaAutor);
+        System.out.println("Tabla autores creada");
     }
 
     @Override
@@ -90,7 +91,7 @@ public class AutorRepositorio implements Repositorio {
 
             preparedStatement.executeUpdate();
 
-            System.out.println("Autor con el ID: "+autor.getIdAutor()+" insertado exitosamente");
+            System.out.println("Autor: "+autor.getNombre()+" insertado exitosamente");
         } catch (SQLException e) {
             System.out.println("Ha ocurrido un error al tratar de insertar el Autor con ID: "+autor.getIdAutor());
             e.printStackTrace();

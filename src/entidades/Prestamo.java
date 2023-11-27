@@ -27,11 +27,10 @@ public class Prestamo {
 
     @Override
     public String toString() {
-        return  "ID Prestamo:" + ID +
-                ", Fecha del prestamo:" + fechaPrestamo +
-                ", Fecha de Devolucion:" + fechaDevolucion +
-                ", Usuario:" + usuarioID +
-                ", Libro:" + libroID +
-                '}';
+        return  "ID Prestamo: " + ID +
+                ", Fecha del prestamo: " + fechaPrestamo +
+                ", Fecha de Devolucion: " + fechaDevolucion +
+                ", Usuario: " + usuarioID +
+                ", Libro: " + libroID;
     }
 }
