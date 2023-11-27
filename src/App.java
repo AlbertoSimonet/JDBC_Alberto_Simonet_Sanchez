@@ -183,7 +183,6 @@ public class App {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 }
 
